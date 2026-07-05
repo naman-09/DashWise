@@ -216,7 +216,7 @@ def test_pbix_tables_are_extracted_with_same_mapping_logic(tmp_path, monkeypatch
     pbix_path.write_bytes(b"placeholder")
 
     class FakePBIX:
-        tables = ["Usage"]
+        tables = ["Usage", "DateTableTemplate_abc123", "LocalDateTable_def456"]
 
         def __enter__(self):
             return self
@@ -247,11 +247,14 @@ def test_pbix_tables_are_extracted_with_same_mapping_logic(tmp_path, monkeypatch
         lambda raw_headers, sample_rows: (_ for _ in ()).throw(LLMMappingError("fallback")),
     )
 
-    dashboards = ingestion_agent.ingest(pbix_path)
+    dashboards, report = ingestion_agent.ingest_with_report(pbix_path)
 
     assert dashboards[0]["dashboard_name"] == "PBIX Usage"
     assert dashboards[0]["bi_tool"] == "Power BI"
     assert dashboards[0]["charts"][0]["chart_title"] == "Refresh Duration"
+    # get_table would assert on any non-"Usage" table, so the auto-generated
+    # date tables must have been skipped before extraction.
+    assert any("Skipped 2 Power BI auto-generated date table(s)" in warning for warning in report["warnings"])
 
 
 def test_pbix_parse_failure_is_reported_without_crashing(tmp_path, monkeypatch):

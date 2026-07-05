@@ -43,3 +43,6 @@ include = ["dashwise*"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-q"
+markers = [
+    "pbix_e2e: end-to-end ingestion of the bundled real PBIX fixture; deselect with -m 'not pbix_e2e' for fast runs",
+]

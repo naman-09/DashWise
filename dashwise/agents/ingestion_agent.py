@@ -132,9 +132,13 @@ def _extract_pbix_tables(path: Path, state: IngestionState) -> list[tuple[str, p
         return []
 
     tables: list[tuple[str, pd.DataFrame]] = []
+    skipped_system_tables = 0
     try:
         with model if hasattr(model, "__enter__") else _NullContext(model) as pbix_model:
             for table_name in _table_names(pbix_model):
+                if _is_pbix_system_table(str(table_name)):
+                    skipped_system_tables += 1
+                    continue
                 try:
                     tables.append((str(table_name), pbix_model.get_table(table_name)))
                 except Exception as exc:  # noqa: BLE001
@@ -143,9 +147,19 @@ def _extract_pbix_tables(path: Path, state: IngestionState) -> list[tuple[str, p
         state.warnings.append(f"Unable to extract PBIX tables: {exc}")
         return []
 
+    if skipped_system_tables:
+        state.warnings.append(
+            f"Skipped {skipped_system_tables} Power BI auto-generated date table(s)."
+        )
+
     if not tables:
         state.warnings.append("PBIX file did not expose any extractable data tables.")
     return tables
+
+
+def _is_pbix_system_table(table_name: str) -> bool:
+    # Hidden auto-date tables Power BI adds to every model; never user data.
+    return table_name.startswith(("DateTableTemplate_", "LocalDateTable_"))
 
 
 def _load_pbix_model(path: Path):
@@ -395,7 +409,10 @@ def _normalize_chart_type(value: str) -> str:
 
 
 def _normalize_label(value: str) -> str:
-    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", str(value).lower())).strip()
+    # PBIX model columns are often camelCase (visualTitle, QueryText); split word
+    # boundaries before lowercasing so they can fuzzy-match spaced aliases.
+    split = re.sub(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", " ", str(value))
+    return re.sub(r"\s+", " ", re.sub(r"[^a-z0-9]+", " ", split.lower())).strip()
 
 
 def _is_missing(value) -> bool:

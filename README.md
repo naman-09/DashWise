@@ -215,7 +215,9 @@ npm run build
 
 The Python suite covers SQL anti-pattern detection, the cost-model tiers and
 arithmetic, decision verdict branches, ingestion behavior, and API upload/sample
-paths. GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml))
+paths. It also ingests a real PBIX fixture
+([tests/fixtures/](tests/fixtures/)) end-to-end through PBIXRay; deselect that
+with `pytest -m "not pbix_e2e"` for the fastest runs. GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml))
 runs the suite and builds the frontend on every push and PR.
 
 ## What Was Intentionally Cut
