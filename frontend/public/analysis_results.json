@@ -3,14 +3,14 @@
     "total_dashboards": 12,
     "total_charts": 49,
     "total_yearly_cost_inr": 186768.4,
-    "total_potential_savings_inr": 124292.0,
+    "total_potential_savings_inr": 130753.0,
     "verdict_counts": {
       "REMOVE": 3,
-      "OPTIMIZE_SQL": 6,
+      "OPTIMIZE_SQL": 15,
       "MONITOR": 14,
-      "KEEP": 26
+      "KEEP": 17
     },
-    "dashboard_health_score": 53.1
+    "dashboard_health_score": 34.7
   },
   "dashboards": [
     {
@@ -33,9 +33,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (5 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
             ],
-            "complexity_score": 47,
+            "complexity_score": 100,
             "join_count": 4,
             "has_select_star": true,
             "parse_error": false
@@ -48,9 +49,9 @@
             "nodes_engaged": 3.5
           },
           "decision": {
-            "verdict": "KEEP",
-            "recommendation": "Chart 'Revenue by Region' is healthy \u2014 good usage, reasonable cost, clean query.",
-            "estimated_yearly_savings_inr": 0
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Revenue by Region' has a poorly optimized query (complexity 100/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 433.0
           }
         },
         {
@@ -66,9 +67,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (2 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
             ],
-            "complexity_score": 45,
+            "complexity_score": 70,
             "join_count": 1,
             "has_select_star": true,
             "parse_error": false
@@ -120,7 +122,7 @@
         }
       ],
       "dashboard_yearly_cost_inr": 6196.94,
-      "dashboard_potential_savings_inr": 3980.0
+      "dashboard_potential_savings_inr": 4413.0
     },
     {
       "dashboard_id": "DASH-002",
@@ -281,9 +283,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (2 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
             ],
-            "complexity_score": 45,
+            "complexity_score": 70,
             "join_count": 1,
             "has_select_star": true,
             "parse_error": false
@@ -314,9 +317,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (5 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
             ],
-            "complexity_score": 47,
+            "complexity_score": 100,
             "join_count": 4,
             "has_select_star": true,
             "parse_error": false
@@ -657,9 +661,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (2 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
             ],
-            "complexity_score": 45,
+            "complexity_score": 70,
             "join_count": 1,
             "has_select_star": true,
             "parse_error": false
@@ -672,9 +677,9 @@
             "nodes_engaged": 2.0
           },
           "decision": {
-            "verdict": "KEEP",
-            "recommendation": "Chart 'Support Ticket Backlog' is healthy \u2014 good usage, reasonable cost, clean query.",
-            "estimated_yearly_savings_inr": 0
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Support Ticket Backlog' has a poorly optimized query (complexity 70/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 237.0
           }
         },
         {
@@ -690,9 +695,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (5 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
             ],
-            "complexity_score": 47,
+            "complexity_score": 100,
             "join_count": 4,
             "has_select_star": true,
             "parse_error": false
@@ -712,7 +718,7 @@
         }
       ],
       "dashboard_yearly_cost_inr": 27212.64,
-      "dashboard_potential_savings_inr": 21855.0
+      "dashboard_potential_savings_inr": 22092.0
     },
     {
       "dashboard_id": "DASH-006",
@@ -766,9 +772,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (5 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
             ],
-            "complexity_score": 47,
+            "complexity_score": 100,
             "join_count": 4,
             "has_select_star": true,
             "parse_error": false
@@ -781,9 +788,9 @@
             "nodes_engaged": 3.5
           },
           "decision": {
-            "verdict": "KEEP",
-            "recommendation": "Chart 'Warehouse Utilization' is healthy \u2014 good usage, reasonable cost, clean query.",
-            "estimated_yearly_savings_inr": 0
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Warehouse Utilization' has a poorly optimized query (complexity 100/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 223.0
           }
         },
         {
@@ -853,7 +860,7 @@
         }
       ],
       "dashboard_yearly_cost_inr": 22074.18,
-      "dashboard_potential_savings_inr": 10481.0
+      "dashboard_potential_savings_inr": 10704.0
     },
     {
       "dashboard_id": "DASH-007",
@@ -907,9 +914,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (2 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
             ],
-            "complexity_score": 45,
+            "complexity_score": 70,
             "join_count": 1,
             "has_select_star": true,
             "parse_error": false
@@ -922,9 +930,9 @@
             "nodes_engaged": 3.5
           },
           "decision": {
-            "verdict": "KEEP",
-            "recommendation": "Chart 'Revenue by Region' is healthy \u2014 good usage, reasonable cost, clean query.",
-            "estimated_yearly_savings_inr": 0
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Revenue by Region' has a poorly optimized query (complexity 70/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 263.0
           }
         },
         {
@@ -993,7 +1001,7 @@
         }
       ],
       "dashboard_yearly_cost_inr": 1093.52,
-      "dashboard_potential_savings_inr": 153.0
+      "dashboard_potential_savings_inr": 416.0
     },
     {
       "dashboard_id": "DASH-008",
@@ -1155,9 +1163,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (5 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
             ],
-            "complexity_score": 47,
+            "complexity_score": 100,
             "join_count": 4,
             "has_select_star": true,
             "parse_error": false
@@ -1170,9 +1179,9 @@
             "nodes_engaged": 3.5
           },
           "decision": {
-            "verdict": "KEEP",
-            "recommendation": "Chart 'Warehouse Utilization' is healthy \u2014 good usage, reasonable cost, clean query.",
-            "estimated_yearly_savings_inr": 0
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Warehouse Utilization' has a poorly optimized query (complexity 100/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 910.0
           }
         },
         {
@@ -1244,7 +1253,7 @@
         }
       ],
       "dashboard_yearly_cost_inr": 5626.83,
-      "dashboard_potential_savings_inr": 726.0
+      "dashboard_potential_savings_inr": 1636.0
     },
     {
       "dashboard_id": "DASH-010",
@@ -1375,9 +1384,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (5 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
             ],
-            "complexity_score": 47,
+            "complexity_score": 100,
             "join_count": 4,
             "has_select_star": true,
             "parse_error": false
@@ -1390,9 +1400,9 @@
             "nodes_engaged": 3.5
           },
           "decision": {
-            "verdict": "KEEP",
-            "recommendation": "Chart 'Plant-wise Production Output' is healthy \u2014 good usage, reasonable cost, clean query.",
-            "estimated_yearly_savings_inr": 0
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Plant-wise Production Output' has a poorly optimized query (complexity 100/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 1164.0
           }
         },
         {
@@ -1441,9 +1451,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (2 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
             ],
-            "complexity_score": 45,
+            "complexity_score": 70,
             "join_count": 1,
             "has_select_star": true,
             "parse_error": false
@@ -1456,9 +1467,9 @@
             "nodes_engaged": 3.5
           },
           "decision": {
-            "verdict": "KEEP",
-            "recommendation": "Chart 'Monthly Active Customers' is healthy \u2014 good usage, reasonable cost, clean query.",
-            "estimated_yearly_savings_inr": 0
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Monthly Active Customers' has a poorly optimized query (complexity 70/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 834.0
           }
         },
         {
@@ -1506,9 +1517,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (2 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
             ],
-            "complexity_score": 45,
+            "complexity_score": 70,
             "join_count": 1,
             "has_select_star": true,
             "parse_error": false
@@ -1539,9 +1551,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (5 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
             ],
-            "complexity_score": 47,
+            "complexity_score": 100,
             "join_count": 4,
             "has_select_star": true,
             "parse_error": false
@@ -1554,14 +1567,14 @@
             "nodes_engaged": 3.5
           },
           "decision": {
-            "verdict": "KEEP",
-            "recommendation": "Chart 'Monthly Active Customers' is healthy \u2014 good usage, reasonable cost, clean query.",
-            "estimated_yearly_savings_inr": 0
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Monthly Active Customers' has a poorly optimized query (complexity 100/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 1371.0
           }
         }
       ],
       "dashboard_yearly_cost_inr": 17321.09,
-      "dashboard_potential_savings_inr": 5178.0
+      "dashboard_potential_savings_inr": 8547.0
     },
     {
       "dashboard_id": "DASH-012",
@@ -1615,9 +1628,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (5 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
             ],
-            "complexity_score": 47,
+            "complexity_score": 100,
             "join_count": 4,
             "has_select_star": true,
             "parse_error": false
@@ -1681,9 +1695,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (2 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
             ],
-            "complexity_score": 45,
+            "complexity_score": 70,
             "join_count": 1,
             "has_select_star": true,
             "parse_error": false
@@ -1696,9 +1711,9 @@
             "nodes_engaged": 3.5
           },
           "decision": {
-            "verdict": "KEEP",
-            "recommendation": "Chart 'Order Fulfillment Rate' is healthy \u2014 good usage, reasonable cost, clean query.",
-            "estimated_yearly_savings_inr": 0
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Order Fulfillment Rate' has a poorly optimized query (complexity 70/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 1026.0
           }
         },
         {
@@ -1714,9 +1729,10 @@
           "sql_analysis": {
             "issues": [
               "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Implicit comma-join style detected (5 tables) \u2014 no explicit JOIN conditions, risk of cartesian product",
               "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
             ],
-            "complexity_score": 47,
+            "complexity_score": 100,
             "join_count": 4,
             "has_select_star": true,
             "parse_error": false
@@ -1736,7 +1752,7 @@
         }
       ],
       "dashboard_yearly_cost_inr": 54119.52,
-      "dashboard_potential_savings_inr": 39761.0
+      "dashboard_potential_savings_inr": 40787.0
     }
   ]
 }

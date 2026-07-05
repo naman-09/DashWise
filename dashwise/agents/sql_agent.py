@@ -27,13 +27,30 @@ def analyze_query(sql: str) -> dict:
         issues.append(f"SELECT * used ({star_count}x) — pulls unnecessary columns, increases scan cost")
         score += 15 * star_count
 
-    # 2. Join count and cross join detection.
-    # Note: modern SQLGlot parses comma-joins (FROM a, b, c) as JOIN nodes, so a
-    # wide comma-join surfaces below as a high join count (and, without a WHERE,
-    # as a missing-filter warning) rather than a separate "implicit join" case.
+    # 2. Join count, cross join, and implicit comma-join detection.
+    # SQLGlot parses each comma-separated table in FROM (FROM a, b, c) as a Join
+    # node carrying no ON/USING condition and no kind/side/method — explicit
+    # joins always have at least one of those, so that bare shape uniquely
+    # identifies comma-style joins.
     joins = list(parsed.find_all(exp.Join))
     join_count = len(joins)
     cross_joins = [j for j in joins if j.kind and j.kind.upper() == "CROSS"]
+    implicit_joins = [
+        j
+        for j in joins
+        if not j.args.get("on")
+        and not j.args.get("using")
+        and not j.kind
+        and not j.side
+        and not j.args.get("method")
+    ]
+
+    if implicit_joins:
+        issues.append(
+            f"Implicit comma-join style detected ({len(implicit_joins) + 1} tables) — "
+            "no explicit JOIN conditions, risk of cartesian product"
+        )
+        score += 25 * len(implicit_joins)
 
     if cross_joins:
         issues.append(f"Explicit CROSS JOIN used ({len(cross_joins)}x) — cartesian product risk, very expensive on large tables")

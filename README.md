@@ -22,9 +22,32 @@ Three small, single-responsibility agents run in sequence over every chart:
 
 | Agent | File | Job |
 |---|---|---|
+| **Ingestion agent** | [dashwise/agents/ingestion_agent.py](dashwise/agents/ingestion_agent.py) | CSV, Excel, and PBIX data-table exports → DashWise dashboard/chart schema |
 | **SQL agent** | [dashwise/agents/sql_agent.py](dashwise/agents/sql_agent.py) | Static SQL analysis with **SQLGlot** (no execution) → anti-patterns + a 0–100 complexity score |
 | **Cost agent** | [dashwise/agents/cost_agent.py](dashwise/agents/cost_agent.py) | Render time + data scanned → **₹ warehouse cost** (Redshift-style pricing) |
 | **Decision agent** | [dashwise/agents/decision_agent.py](dashwise/agents/decision_agent.py) | Usage + cost + SQL quality → a **verdict** and estimated ₹ savings |
+
+## Raw export ingestion
+
+`dashwise.agents.ingestion_agent.ingest(path)` converts messy CSV, Excel, or
+PBIX inputs into the same dashboard list consumed by `pipeline.analyze()`.
+Column mapping is attempted once per file/table with an LLM and falls back to
+fuzzy matching when the model is unavailable or returns malformed JSON.
+
+LLM settings:
+
+```bash
+LLM_PROVIDER=ollama
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=llama3.1:8b
+GEMINI_API_KEY=...
+GEMINI_MODEL=gemini-3.1-flash-lite
+```
+
+PBIX support uses PBIXRay to extract embedded data tables only. It does not
+extract DAX measures or report visuals. If you need measures, visual layout, or
+Power BI report-page metadata, export the relevant data from Power BI Desktop to
+CSV/Excel first and ingest that export as the fallback path.
 
 ## Architecture
 

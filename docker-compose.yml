@@ -1,27 +1,24 @@
 # One-command demo:  docker compose up --build
 #
-#   1. `pipeline` generates synthetic data, runs the SQL/cost/decision agents,
-#      and publishes analysis_results.json to the shared `analysis` volume.
-#   2. `frontend` waits for the pipeline to finish, then serves the React
-#      console (with the freshly generated data) at http://localhost:8080
+#   1. `api` serves stateless upload/sample analysis at http://localhost:8000.
+#   2. `frontend` serves the React console at http://localhost:8080.
 services:
-  pipeline:
+  api:
     build:
       context: .
       dockerfile: Dockerfile.pipeline
-    volumes:
-      - analysis:/shared
+    command: uvicorn dashwise.api:app --host 0.0.0.0 --port 8000
+    environment:
+      DASHWISE_CORS_ORIGINS: ${DASHWISE_CORS_ORIGINS:-*}
+    ports:
+      - "8000:8000"
 
   frontend:
     build:
       context: ./frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL:-http://localhost:8000}
     ports:
       - "8080:80"
-    volumes:
-      - analysis:/shared:ro
     depends_on:
-      pipeline:
-        condition: service_completed_successfully
-
-volumes:
-  analysis:
+      - api

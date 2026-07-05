@@ -29,9 +29,6 @@ def test_select_star_counts_multiple_stars():
 
 
 def test_comma_join_sprawl_is_flagged():
-    # NOTE: with modern SQLGlot, comma-joins (FROM a, b, c ...) parse as JOIN
-    # nodes, so a wide comma-join surfaces as a high join count rather than the
-    # legacy "implicit comma-join" branch. Either way, the sprawl gets caught.
     result = analyze_query(
         """SELECT *
         FROM fact_sales fs, dim_customer dc, dim_product dp, dim_region dr, dim_date dd
@@ -40,6 +37,7 @@ def test_comma_join_sprawl_is_flagged():
           AND fs.region_id = dr.region_id
           AND fs.date_id = dd.date_id"""
     )
+    assert "Implicit comma-join style detected (5 tables)" in _issues_text(result)
     assert result["join_count"] == 4
     assert "High join count" in _issues_text(result)
     assert result["has_select_star"] is True
@@ -47,7 +45,28 @@ def test_comma_join_sprawl_is_flagged():
 
 def test_comma_join_without_where_is_flagged():
     result = analyze_query("SELECT a.id FROM table_a a, table_b b")
+    assert "Implicit comma-join style detected (2 tables)" in _issues_text(result)
     assert "No WHERE clause despite joins" in _issues_text(result)
+
+
+def test_explicit_joins_not_flagged_as_implicit():
+    # ON, USING, NATURAL, and CROSS joins must not trip the comma-join branch.
+    for sql in (
+        "SELECT a.id FROM a JOIN b ON a.id = b.id WHERE a.x = 1",
+        "SELECT a.id FROM a LEFT JOIN b ON a.id = b.id WHERE a.x = 1",
+        "SELECT a.id FROM a JOIN b USING (id) WHERE a.x = 1",
+        "SELECT a.id FROM a NATURAL JOIN b WHERE a.x = 1",
+        "SELECT a.id FROM a CROSS JOIN b WHERE a.x = 1",
+    ):
+        result = analyze_query(sql)
+        assert "Implicit comma-join" not in _issues_text(result), sql
+
+
+def test_mixed_comma_and_explicit_joins_flags_only_comma_part():
+    result = analyze_query(
+        "SELECT a.id FROM a, b JOIN c ON b.id = c.id WHERE a.id = b.id"
+    )
+    assert "Implicit comma-join style detected (2 tables)" in _issues_text(result)
 
 
 def test_explicit_cross_join_flagged():
