@@ -32,6 +32,14 @@ class LLMMappingError(RuntimeError):
     """Raised when an LLM backend cannot return a validated column mapping."""
 
 
+class LLMUnavailableError(LLMMappingError):
+    """Raised when the LLM backend cannot be reached at all.
+
+    Callers ingesting multi-table files use this to stop re-attempting the
+    LLM for every table once the backend has proven unreachable.
+    """
+
+
 def map_columns(raw_headers: list[str], sample_rows: list[dict]) -> dict:
     """Map raw headers to DashWise canonical fields using the configured LLM."""
     provider = os.getenv("LLM_PROVIDER", "ollama").strip().lower()
@@ -105,7 +113,9 @@ def _call_ollama(prompt: str) -> str:
     try:
         with urllib.request.urlopen(request, timeout=8) as response:
             payload = json.loads(response.read().decode("utf-8"))
-    except (OSError, urllib.error.URLError, json.JSONDecodeError) as exc:
+    except (OSError, urllib.error.URLError) as exc:
+        raise LLMUnavailableError("Ollama is unreachable") from exc
+    except json.JSONDecodeError as exc:
         raise LLMMappingError("Ollama column mapping request failed") from exc
 
     response_text = payload.get("response")
@@ -117,7 +127,7 @@ def _call_ollama(prompt: str) -> str:
 def _call_gemini(prompt: str) -> str:
     api_key = os.getenv("GEMINI_API_KEY")
     if not api_key:
-        raise LLMMappingError("GEMINI_API_KEY is required when LLM_PROVIDER=gemini")
+        raise LLMUnavailableError("GEMINI_API_KEY is required when LLM_PROVIDER=gemini")
 
     model = os.getenv("GEMINI_MODEL", DEFAULT_GEMINI_MODEL)
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent?key={api_key}"
@@ -135,7 +145,9 @@ def _call_gemini(prompt: str) -> str:
     try:
         with urllib.request.urlopen(request, timeout=15) as response:
             payload = json.loads(response.read().decode("utf-8"))
-    except (OSError, urllib.error.URLError, json.JSONDecodeError) as exc:
+    except (OSError, urllib.error.URLError) as exc:
+        raise LLMUnavailableError("Gemini is unreachable") from exc
+    except json.JSONDecodeError as exc:
         raise LLMMappingError("Gemini column mapping request failed") from exc
 
     try:

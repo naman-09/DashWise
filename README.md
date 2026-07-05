@@ -65,7 +65,9 @@ FastAPI upload path.
 
 Column mapping is attempted once per file/table with an LLM. If the LLM is not
 available, times out, or returns malformed JSON, ingestion falls back to
-rapidfuzz matching instead of crashing.
+rapidfuzz matching instead of crashing. Once the backend proves unreachable,
+the remaining tables in that file skip the LLM entirely so multi-table files
+degrade quickly instead of paying a connection timeout per table.
 
 PBIX support uses PBIXRay to extract embedded data tables only. It does not
 extract DAX measures or report visuals. If you need measures, visual layout, or

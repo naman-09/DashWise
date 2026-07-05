@@ -1,8 +1,8 @@
 import pandas as pd
 import pytest
 
-from dashwise.agents import ingestion_agent
-from dashwise.agents.llm_client import LLMMappingError
+from dashwise.agents import ingestion_agent, llm_client
+from dashwise.agents.llm_client import LLMMappingError, LLMUnavailableError
 
 
 @pytest.fixture
@@ -209,6 +209,48 @@ def test_malformed_llm_response_falls_back_to_fuzzy_matching(tmp_path, monkeypat
 
     assert report["mapping_source"] == "fuzzy_fallback"
     assert report["column_mapping_used"]["chart_title"] == "chart_title"
+
+
+def test_unreachable_llm_is_attempted_only_once_per_file(tmp_path, monkeypatch):
+    path = tmp_path / "multi.xlsx"
+    sheet = pd.DataFrame([{"chart_title": "Chart", "weekly_views": 1}])
+    with pd.ExcelWriter(path) as writer:
+        sheet.to_excel(writer, sheet_name="Sheet1", index=False)
+        sheet.to_excel(writer, sheet_name="Sheet2", index=False)
+        sheet.to_excel(writer, sheet_name="Sheet3", index=False)
+
+    calls = []
+
+    def unreachable(raw_headers, sample_rows):
+        calls.append(raw_headers)
+        raise LLMUnavailableError("Ollama is unreachable")
+
+    monkeypatch.setattr(ingestion_agent.llm_client, "map_columns", unreachable)
+
+    dashboards, report = ingestion_agent.ingest_with_report(path)
+
+    assert len(calls) == 1
+    assert report["mapping_source"] == "fuzzy_fallback"
+    assert sum(len(d["charts"]) for d in dashboards) == 3
+    assert any("LLM unavailable" in warning for warning in report["warnings"])
+
+
+def test_connection_failure_raises_llm_unavailable_error(monkeypatch):
+    # Real network attempt: port 0 is never connectable, so the client must
+    # classify the failure as "unavailable" (and do so immediately).
+    monkeypatch.setenv("LLM_PROVIDER", "ollama")
+    monkeypatch.setenv("OLLAMA_BASE_URL", "http://127.0.0.1:0")
+
+    with pytest.raises(LLMUnavailableError):
+        llm_client.map_columns(["chart_title"], [{"chart_title": "Revenue"}])
+
+
+def test_missing_gemini_key_raises_llm_unavailable_error(monkeypatch):
+    monkeypatch.setenv("LLM_PROVIDER", "gemini")
+    monkeypatch.delenv("GEMINI_API_KEY", raising=False)
+
+    with pytest.raises(LLMUnavailableError):
+        llm_client.map_columns(["chart_title"], [{"chart_title": "Revenue"}])
 
 
 def test_pbix_tables_are_extracted_with_same_mapping_logic(tmp_path, monkeypatch):

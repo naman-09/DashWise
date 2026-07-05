@@ -9,7 +9,7 @@ from pathlib import Path
 import pandas as pd
 
 from dashwise.agents import llm_client
-from dashwise.agents.llm_client import ALLOWED_CANONICAL_FIELDS, LLMMappingError
+from dashwise.agents.llm_client import ALLOWED_CANONICAL_FIELDS, LLMMappingError, LLMUnavailableError
 
 try:
     from rapidfuzz import fuzz
@@ -51,6 +51,7 @@ class IngestionState:
     warnings: list[str] = field(default_factory=list)
     column_mapping_used: dict[str, str | None] = field(default_factory=dict)
     mapping_source: str = "fuzzy_fallback"
+    llm_unavailable: bool = False
 
 
 def ingest(file_path) -> list[dict]:
@@ -203,6 +204,9 @@ def _normalize_dataframe(frame: pd.DataFrame) -> pd.DataFrame:
 
 def _build_column_mapping(frame: pd.DataFrame, state: IngestionState, table_name: str) -> tuple[dict, str]:
     raw_headers = list(frame.columns)
+    if state.llm_unavailable:
+        return _fuzzy_map_columns(raw_headers), "fuzzy_fallback"
+
     sample_rows = [_jsonable_sample(row) for row in frame.head(5).to_dict(orient="records")]
     try:
         mapping = llm_client.map_columns(raw_headers, sample_rows)
@@ -210,6 +214,11 @@ def _build_column_mapping(frame: pd.DataFrame, state: IngestionState, table_name
         if any(value is not None for value in mapping.values()):
             return mapping, "llm"
         state.warnings.append(f"LLM returned no usable column matches for table '{table_name}'.")
+    except LLMUnavailableError as exc:
+        state.llm_unavailable = True
+        state.warnings.append(
+            f"LLM unavailable at table '{table_name}'; using fuzzy fallback for the rest of this file. {exc}"
+        )
     except (LLMMappingError, ValueError, RuntimeError) as exc:
         state.warnings.append(f"LLM column mapping failed for table '{table_name}'; used fuzzy fallback. {exc}")
     return _fuzzy_map_columns(raw_headers), "fuzzy_fallback"
