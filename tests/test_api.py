@@ -56,6 +56,54 @@ def test_analyze_upload_success_returns_analysis_and_ingestion_report(client, no
     assert "total_yearly_cost_inr" in payload["summary"]
 
 
+def test_analyze_upload_accepts_pbix_extension(client, monkeypatch):
+    dashboards = [
+        {
+            "dashboard_id": "DASH-001",
+            "dashboard_name": "PBIX Usage",
+            "business_unit": "Operations",
+            "owner": "Ananya",
+            "bi_tool": "Power BI",
+            "charts": [
+                {
+                    "chart_id": "CHART-0001",
+                    "chart_title": "Refresh Duration",
+                    "chart_type": "line_chart",
+                    "sql_query": "select 1 as metric",
+                    "weekly_views": 12,
+                    "avg_view_duration_sec": 30,
+                    "render_time_sec": 3,
+                    "data_scanned_gb": 4,
+                    "runs_per_week": 7,
+                }
+            ],
+        }
+    ]
+    report = {
+        "rows_processed": 1,
+        "rows_dropped": 0,
+        "warnings": [],
+        "column_mapping_used": {},
+        "mapping_source": "fuzzy_fallback",
+    }
+
+    def fake_ingest_with_report(file_path):
+        assert file_path.suffix == ".pbix"
+        return dashboards, report
+
+    monkeypatch.setattr(ingestion_agent, "ingest_with_report", fake_ingest_with_report)
+
+    response = client.post(
+        "/analyze",
+        files={"file": ("usage.pbix", b"minimal pbix placeholder", "application/octet-stream")},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["summary"]["total_dashboards"] == 1
+    assert payload["ingestion_report"]["rows_processed"] == 1
+
+
 def test_analyze_sample_uses_generated_dashboards(client):
     response = client.post("/analyze/sample")
 

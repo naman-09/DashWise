@@ -186,7 +186,7 @@ export default function App() {
         {controls}
         <div className="rounded-xl border bg-surface p-8 text-center" style={{ borderColor: "var(--border)" }}>
           <h2 className="text-lg font-semibold text-ink">No analysis data found</h2>
-          <p className="mt-2 text-sm text-ink-secondary">Upload a CSV/XLSX export or load sample data to begin.</p>
+          <p className="mt-2 text-sm text-ink-secondary">Upload a CSV/XLSX/PBIX export or load sample data to begin.</p>
         </div>
       </div>
     );
@@ -249,7 +249,7 @@ function AnalysisControls({ loading, onFile, onSample }) {
         <div>
           <div className="text-sm font-semibold text-ink">Analyze dashboard export</div>
           <div className="mt-1 text-sm text-ink-secondary">
-            {fileName ? `Last upload: ${fileName}` : "Upload a CSV/XLSX file or run the generated sample analysis."}
+            {fileName ? `Last upload: ${fileName}` : "Upload a CSV/XLSX/PBIX file or run the generated sample analysis."}
           </div>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -259,12 +259,12 @@ function AnalysisControls({ loading, onFile, onSample }) {
           >
             <input
               type="file"
-              accept=".csv,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+              accept=".csv,.xlsx,.pbix,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/octet-stream"
               className="sr-only"
               disabled={loading}
               onChange={handleFileChange}
             />
-            Upload CSV/XLSX
+            Upload CSV/XLSX/PBIX
           </label>
           <button
             type="button"
@@ -320,7 +320,7 @@ function Shell({ theme, setTheme, analysisMode, children }) {
   const subtitle =
     analysisMode === "sample"
       ? "Sample demo data - warehouse cost modeled on Redshift ra3.xlplus (INR 210/node-hour, Mumbai)"
-      : "Live analysis from uploaded BI exports";
+      : "Live analysis - warehouse cost modeled on Redshift ra3.xlplus (INR 210/node-hour, Mumbai)";
 
   return (
     <div className="min-h-screen">

@@ -13,7 +13,7 @@ from fastapi.responses import JSONResponse
 from dashwise import datagen, pipeline
 from dashwise.agents import ingestion_agent
 
-SUPPORTED_UPLOAD_EXTENSIONS = {".csv", ".xlsx"}
+SUPPORTED_UPLOAD_EXTENSIONS = {".csv", ".xlsx", ".pbix"}
 
 
 def _cors_origins() -> list[str]:
@@ -40,7 +40,7 @@ def health() -> dict:
 
 @app.post("/analyze")
 async def analyze_upload(file: UploadFile = File(...)):
-    """Analyze an uploaded CSV/XLSX export and return full analysis JSON."""
+    """Analyze an uploaded CSV/XLSX/PBIX export and return full analysis JSON."""
     suffix = Path(file.filename or "").suffix.lower()
     if suffix not in SUPPORTED_UPLOAD_EXTENSIONS:
         return _validation_error([f"Unsupported file extension: {suffix or '<none>'}"])
