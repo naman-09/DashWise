@@ -9,8 +9,7 @@ compute cost (₹)**, and **actual usage**. It produces a per-chart verdict
 > The bundled demo estate is synthetic. See
 > [What's Real vs Synthetic](#whats-real-vs-synthetic).
 
-<!-- Replace OWNER/REPO after pushing to GitHub to activate the badge. -->
-![CI](https://github.com/OWNER/REPO/actions/workflows/ci.yml/badge.svg)
+![CI](https://github.com/naman-09/DashWise/actions/workflows/ci.yml/badge.svg)
 
 ## What It Does
 

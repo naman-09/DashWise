@@ -24,3 +24,6 @@ Thumbs.db
 
 # Local tooling
 .claude/
+
+# Local sparse clone used to source the PBIX test fixture (not part of the repo)
+.pbix_source/
