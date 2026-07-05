@@ -1,0 +1,15 @@
+# Normalize line endings so the repo is deterministic across Windows/Linux.
+# The project builds and runs on Linux (Docker, CI), so text is stored as LF.
+* text=auto eol=lf
+
+# Shell scripts MUST be LF — a CRLF shebang breaks inside the container.
+*.sh text eol=lf
+
+# Binary assets — never touch line endings.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary
