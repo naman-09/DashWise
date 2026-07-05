@@ -1,0 +1,14 @@
+# DashWise pipeline image — runs the analysis and publishes results.json to a
+# shared volume the frontend container serves.
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install the package (deps: sqlglot, click).
+COPY pyproject.toml README.md ./
+COPY dashwise ./dashwise
+RUN pip install --no-cache-dir .
+
+# generate synthetic data -> run agents -> render report, then hand the
+# analysis JSON to the shared volume the frontend reads from.
+CMD ["sh", "-c", "dashwise run && mkdir -p /shared && cp output/analysis_results.json /shared/analysis_results.json && echo 'Published analysis to /shared'"]

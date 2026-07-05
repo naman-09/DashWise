@@ -1,0 +1,1742 @@
+{
+  "summary": {
+    "total_dashboards": 12,
+    "total_charts": 49,
+    "total_yearly_cost_inr": 186768.4,
+    "total_potential_savings_inr": 124292.0,
+    "verdict_counts": {
+      "REMOVE": 3,
+      "OPTIMIZE_SQL": 6,
+      "MONITOR": 14,
+      "KEEP": 26
+    },
+    "dashboard_health_score": 53.1
+  },
+  "dashboards": [
+    {
+      "dashboard_id": "DASH-001",
+      "dashboard_name": "Sales Dashboard 1",
+      "business_unit": "Operations",
+      "owner": "Ananya Iyer",
+      "bi_tool": "Power BI",
+      "charts": [
+        {
+          "chart_id": "CHART-0001",
+          "chart_title": "Revenue by Region",
+          "chart_type": "bar_chart",
+          "sql_query": "SELECT *\nFROM fact_sales fs, dim_customer dc, dim_product dp, dim_region dr, dim_date dd\nWHERE fs.customer_id = dc.customer_id\nAND fs.product_id = dp.product_id\nAND fs.region_id = dr.region_id\nAND fs.date_id = dd.date_id",
+          "weekly_views": 28,
+          "avg_view_duration_sec": 40.4,
+          "render_time_sec": 9.7,
+          "data_scanned_gb": 402.9,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
+            ],
+            "complexity_score": 47,
+            "join_count": 4,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 1.98,
+            "weekly_cost_inr": 27.73,
+            "monthly_cost_inr": 120.05,
+            "yearly_cost_inr": 1441.74,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Revenue by Region' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0002",
+          "chart_title": "Order Fulfillment Rate",
+          "chart_type": "kpi_card",
+          "sql_query": "SELECT s.*, i.*\nFROM fact_shipments s, dim_inventory i\nWHERE s.warehouse_id = i.warehouse_id\nAND s.status != 'DELIVERED'\nGROUP BY s.shipment_id",
+          "weekly_views": 0,
+          "avg_view_duration_sec": 10.6,
+          "render_time_sec": 21.0,
+          "data_scanned_gb": 508.6,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
+            ],
+            "complexity_score": 45,
+            "join_count": 1,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 4.29,
+            "weekly_cost_inr": 90.04,
+            "monthly_cost_inr": 389.86,
+            "yearly_cost_inr": 4681.95,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Order Fulfillment Rate' is low-usage (0 views/week) but low-cost (\u20b9390/month). Not urgent, but flag owner (Ananya Iyer) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 3980.0
+          }
+        },
+        {
+          "chart_id": "CHART-0003",
+          "chart_title": "Order Fulfillment Rate",
+          "chart_type": "scatter_plot",
+          "sql_query": "SELECT region, SUM(revenue) as total_revenue\nFROM fact_sales\nWHERE order_date >= CURRENT_DATE - INTERVAL '90 days'\nGROUP BY region\nORDER BY total_revenue DESC",
+          "weekly_views": 35,
+          "avg_view_duration_sec": 8.9,
+          "render_time_sec": 2.3,
+          "data_scanned_gb": 2.6,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "ORDER BY without LIMIT \u2014 sorts entire result set unnecessarily"
+            ],
+            "complexity_score": 10,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.07,
+            "weekly_cost_inr": 1.41,
+            "monthly_cost_inr": 6.1,
+            "yearly_cost_inr": 73.25,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Order Fulfillment Rate' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 6196.94,
+      "dashboard_potential_savings_inr": 3980.0
+    },
+    {
+      "dashboard_id": "DASH-002",
+      "dashboard_name": "Sales Dashboard 2",
+      "business_unit": "HR",
+      "owner": "Priya Sharma",
+      "bi_tool": "Power BI",
+      "charts": [
+        {
+          "chart_id": "CHART-0004",
+          "chart_title": "Plant-wise Production Output",
+          "chart_type": "kpi_card",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 7,
+          "avg_view_duration_sec": 3.9,
+          "render_time_sec": 2.4,
+          "data_scanned_gb": 1.4,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.07,
+            "weekly_cost_inr": 0.49,
+            "monthly_cost_inr": 2.12,
+            "yearly_cost_inr": 25.48,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Plant-wise Production Output' is low-usage (7 views/week) but low-cost (\u20b92/month). Not urgent, but flag owner (Priya Sharma) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 22.0
+          }
+        },
+        {
+          "chart_id": "CHART-0005",
+          "chart_title": "Revenue by Region",
+          "chart_type": "heatmap",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 24,
+          "avg_view_duration_sec": 39.1,
+          "render_time_sec": 2.7,
+          "data_scanned_gb": 5.8,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.16,
+            "weekly_cost_inr": 2.21,
+            "monthly_cost_inr": 9.55,
+            "yearly_cost_inr": 114.66,
+            "nodes_engaged": 1.0
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Revenue by Region' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0006",
+          "chart_title": "Vendor Payment Ageing",
+          "chart_type": "pie_chart",
+          "sql_query": "SELECT region, SUM(revenue) as total_revenue\nFROM fact_sales\nWHERE order_date >= CURRENT_DATE - INTERVAL '90 days'\nGROUP BY region\nORDER BY total_revenue DESC",
+          "weekly_views": 48,
+          "avg_view_duration_sec": 39.3,
+          "render_time_sec": 2.1,
+          "data_scanned_gb": 3.9,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "ORDER BY without LIMIT \u2014 sorts entire result set unnecessarily"
+            ],
+            "complexity_score": 10,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.06,
+            "weekly_cost_inr": 0.86,
+            "monthly_cost_inr": 3.71,
+            "yearly_cost_inr": 44.59,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Vendor Payment Ageing' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 184.73,
+      "dashboard_potential_savings_inr": 22.0
+    },
+    {
+      "dashboard_id": "DASH-003",
+      "dashboard_name": "Supply Chain Dashboard 3",
+      "business_unit": "Finance",
+      "owner": "Arjun Rao",
+      "bi_tool": "Power BI",
+      "charts": [
+        {
+          "chart_id": "CHART-0007",
+          "chart_title": "Headcount Trend",
+          "chart_type": "kpi_card",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 26,
+          "avg_view_duration_sec": 28.2,
+          "render_time_sec": 1.5,
+          "data_scanned_gb": 6.0,
+          "runs_per_week": 168,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.09,
+            "weekly_cost_inr": 14.7,
+            "monthly_cost_inr": 63.65,
+            "yearly_cost_inr": 764.4,
+            "nodes_engaged": 1.0
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Headcount Trend' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0008",
+          "chart_title": "Vendor Payment Ageing",
+          "chart_type": "bar_chart",
+          "sql_query": "SELECT s.*, i.*\nFROM fact_shipments s, dim_inventory i\nWHERE s.warehouse_id = i.warehouse_id\nAND s.status != 'DELIVERED'\nGROUP BY s.shipment_id",
+          "weekly_views": 6,
+          "avg_view_duration_sec": 15.9,
+          "render_time_sec": 23.4,
+          "data_scanned_gb": 88.1,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
+            ],
+            "complexity_score": 45,
+            "join_count": 1,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 2.73,
+            "weekly_cost_inr": 57.33,
+            "monthly_cost_inr": 248.24,
+            "yearly_cost_inr": 2981.16,
+            "nodes_engaged": 2.0
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Vendor Payment Ageing' is low-usage (6 views/week) but low-cost (\u20b9248/month). Not urgent, but flag owner (Arjun Rao) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 2534.0
+          }
+        },
+        {
+          "chart_id": "CHART-0009",
+          "chart_title": "Employee Attrition by Dept",
+          "chart_type": "kpi_card",
+          "sql_query": "SELECT *\nFROM fact_sales fs, dim_customer dc, dim_product dp, dim_region dr, dim_date dd\nWHERE fs.customer_id = dc.customer_id\nAND fs.product_id = dp.product_id\nAND fs.region_id = dr.region_id\nAND fs.date_id = dd.date_id",
+          "weekly_views": 5,
+          "avg_view_duration_sec": 42.5,
+          "render_time_sec": 25.5,
+          "data_scanned_gb": 310.6,
+          "runs_per_week": 168,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
+            ],
+            "complexity_score": 47,
+            "join_count": 4,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 5.21,
+            "weekly_cost_inr": 874.65,
+            "monthly_cost_inr": 3787.23,
+            "yearly_cost_inr": 45481.8,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "REMOVE",
+            "recommendation": "Chart 'Employee Attrition by Dept' is viewed only 5x/week but costs \u20b93,787/month (\u20b945,482/year) in warehouse compute. Recommend replacing with a static pre-aggregated KPI card refreshed daily instead of on every dashboard load.",
+            "estimated_yearly_savings_inr": 38660.0
+          }
+        },
+        {
+          "chart_id": "CHART-0010",
+          "chart_title": "Customer Churn by Segment",
+          "chart_type": "heatmap",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 15,
+          "avg_view_duration_sec": 13.4,
+          "render_time_sec": 1.7,
+          "data_scanned_gb": 4.7,
+          "runs_per_week": 168,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.05,
+            "weekly_cost_inr": 8.33,
+            "monthly_cost_inr": 36.07,
+            "yearly_cost_inr": 433.16,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Customer Churn by Segment' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0011",
+          "chart_title": "Lead Funnel Conversion",
+          "chart_type": "bar_chart",
+          "sql_query": "SELECT product_category, COUNT(DISTINCT customer_id) as unique_customers\nFROM fact_orders o\nJOIN dim_product p ON o.product_id = p.product_id\nWHERE o.order_date >= CURRENT_DATE - INTERVAL '30 days'\nGROUP BY product_category",
+          "weekly_views": 11,
+          "avg_view_duration_sec": 44.9,
+          "render_time_sec": 1.4,
+          "data_scanned_gb": 4.2,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 1,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.04,
+            "weekly_cost_inr": 0.29,
+            "monthly_cost_inr": 1.24,
+            "yearly_cost_inr": 14.86,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Lead Funnel Conversion' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 49675.38,
+      "dashboard_potential_savings_inr": 41194.0
+    },
+    {
+      "dashboard_id": "DASH-004",
+      "dashboard_name": "Operations Dashboard 4",
+      "business_unit": "Finance",
+      "owner": "Arjun Rao",
+      "bi_tool": "Power BI",
+      "charts": [
+        {
+          "chart_id": "CHART-0012",
+          "chart_title": "Vendor Payment Ageing",
+          "chart_type": "bar_chart",
+          "sql_query": "SELECT product_category, COUNT(DISTINCT customer_id) as unique_customers\nFROM fact_orders o\nJOIN dim_product p ON o.product_id = p.product_id\nWHERE o.order_date >= CURRENT_DATE - INTERVAL '30 days'\nGROUP BY product_category",
+          "weekly_views": 12,
+          "avg_view_duration_sec": 44.8,
+          "render_time_sec": 2.6,
+          "data_scanned_gb": 7.8,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 1,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.15,
+            "weekly_cost_inr": 1.06,
+            "monthly_cost_inr": 4.6,
+            "yearly_cost_inr": 55.21,
+            "nodes_engaged": 1.0
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Vendor Payment Ageing' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0013",
+          "chart_title": "Headcount Trend",
+          "chart_type": "kpi_card",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 34,
+          "avg_view_duration_sec": 35.0,
+          "render_time_sec": 2.0,
+          "data_scanned_gb": 2.7,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.06,
+            "weekly_cost_inr": 0.41,
+            "monthly_cost_inr": 1.77,
+            "yearly_cost_inr": 21.23,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Headcount Trend' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0014",
+          "chart_title": "Vendor Payment Ageing",
+          "chart_type": "heatmap",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 7,
+          "avg_view_duration_sec": 23.5,
+          "render_time_sec": 1.5,
+          "data_scanned_gb": 7.3,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.09,
+            "weekly_cost_inr": 1.84,
+            "monthly_cost_inr": 7.96,
+            "yearly_cost_inr": 95.55,
+            "nodes_engaged": 1.0
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Vendor Payment Ageing' is low-usage (7 views/week) but low-cost (\u20b98/month). Not urgent, but flag owner (Arjun Rao) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 81.0
+          }
+        },
+        {
+          "chart_id": "CHART-0015",
+          "chart_title": "Lead Funnel Conversion",
+          "chart_type": "table",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 23,
+          "avg_view_duration_sec": 8.6,
+          "render_time_sec": 3.3,
+          "data_scanned_gb": 4.5,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.1,
+            "weekly_cost_inr": 0.67,
+            "monthly_cost_inr": 2.92,
+            "yearly_cost_inr": 35.04,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Lead Funnel Conversion' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 207.03,
+      "dashboard_potential_savings_inr": 81.0
+    },
+    {
+      "dashboard_id": "DASH-005",
+      "dashboard_name": "HR Dashboard 5",
+      "business_unit": "Sales",
+      "owner": "Priya Sharma",
+      "bi_tool": "Power BI",
+      "charts": [
+        {
+          "chart_id": "CHART-0016",
+          "chart_title": "Freight Cost Trend",
+          "chart_type": "kpi_card",
+          "sql_query": "SELECT product_category, COUNT(DISTINCT customer_id) as unique_customers\nFROM fact_orders o\nJOIN dim_product p ON o.product_id = p.product_id\nWHERE o.order_date >= CURRENT_DATE - INTERVAL '30 days'\nGROUP BY product_category",
+          "weekly_views": 6,
+          "avg_view_duration_sec": 12.4,
+          "render_time_sec": 2.7,
+          "data_scanned_gb": 1.1,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 1,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.08,
+            "weekly_cost_inr": 0.55,
+            "monthly_cost_inr": 2.39,
+            "yearly_cost_inr": 28.66,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Freight Cost Trend' is low-usage (6 views/week) but low-cost (\u20b92/month). Not urgent, but flag owner (Priya Sharma) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 24.0
+          }
+        },
+        {
+          "chart_id": "CHART-0017",
+          "chart_title": "Customer Churn by Segment",
+          "chart_type": "table",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 36,
+          "avg_view_duration_sec": 7.5,
+          "render_time_sec": 2.4,
+          "data_scanned_gb": 4.6,
+          "runs_per_week": 168,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.07,
+            "weekly_cost_inr": 11.76,
+            "monthly_cost_inr": 50.92,
+            "yearly_cost_inr": 611.52,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Customer Churn by Segment' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0018",
+          "chart_title": "Employee Attrition by Dept",
+          "chart_type": "heatmap",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 35,
+          "avg_view_duration_sec": 31.7,
+          "render_time_sec": 3.1,
+          "data_scanned_gb": 3.5,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.09,
+            "weekly_cost_inr": 1.9,
+            "monthly_cost_inr": 8.22,
+            "yearly_cost_inr": 98.74,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Employee Attrition by Dept' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0019",
+          "chart_title": "Support Ticket Backlog",
+          "chart_type": "line_chart",
+          "sql_query": "SELECT s.*, i.*\nFROM fact_shipments s, dim_inventory i\nWHERE s.warehouse_id = i.warehouse_id\nAND s.status != 'DELIVERED'\nGROUP BY s.shipment_id",
+          "weekly_views": 15,
+          "avg_view_duration_sec": 12.7,
+          "render_time_sec": 9.3,
+          "data_scanned_gb": 58.1,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
+            ],
+            "complexity_score": 45,
+            "join_count": 1,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 1.08,
+            "weekly_cost_inr": 15.19,
+            "monthly_cost_inr": 65.77,
+            "yearly_cost_inr": 789.88,
+            "nodes_engaged": 2.0
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Support Ticket Backlog' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0020",
+          "chart_title": "Order Fulfillment Rate",
+          "chart_type": "pie_chart",
+          "sql_query": "SELECT *\nFROM fact_sales fs, dim_customer dc, dim_product dp, dim_region dr, dim_date dd\nWHERE fs.customer_id = dc.customer_id\nAND fs.product_id = dp.product_id\nAND fs.region_id = dr.region_id\nAND fs.date_id = dd.date_id",
+          "weekly_views": 6,
+          "avg_view_duration_sec": 40.9,
+          "render_time_sec": 25.2,
+          "data_scanned_gb": 100.9,
+          "runs_per_week": 168,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
+            ],
+            "complexity_score": 47,
+            "join_count": 4,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 2.94,
+            "weekly_cost_inr": 493.92,
+            "monthly_cost_inr": 2138.67,
+            "yearly_cost_inr": 25683.84,
+            "nodes_engaged": 2.0
+          },
+          "decision": {
+            "verdict": "REMOVE",
+            "recommendation": "Chart 'Order Fulfillment Rate' is viewed only 6x/week but costs \u20b92,139/month (\u20b925,684/year) in warehouse compute. Recommend replacing with a static pre-aggregated KPI card refreshed daily instead of on every dashboard load.",
+            "estimated_yearly_savings_inr": 21831.0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 27212.64,
+      "dashboard_potential_savings_inr": 21855.0
+    },
+    {
+      "dashboard_id": "DASH-006",
+      "dashboard_name": "Marketing Dashboard 6",
+      "business_unit": "Finance",
+      "owner": "Arjun Rao",
+      "bi_tool": "Tableau",
+      "charts": [
+        {
+          "chart_id": "CHART-0021",
+          "chart_title": "Top 10 SKUs by Volume",
+          "chart_type": "pie_chart",
+          "sql_query": "SELECT region, SUM(revenue) as total_revenue\nFROM fact_sales\nWHERE order_date >= CURRENT_DATE - INTERVAL '90 days'\nGROUP BY region\nORDER BY total_revenue DESC",
+          "weekly_views": 38,
+          "avg_view_duration_sec": 36.7,
+          "render_time_sec": 1.6,
+          "data_scanned_gb": 1.2,
+          "runs_per_week": 168,
+          "sql_analysis": {
+            "issues": [
+              "ORDER BY without LIMIT \u2014 sorts entire result set unnecessarily"
+            ],
+            "complexity_score": 10,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.05,
+            "weekly_cost_inr": 7.84,
+            "monthly_cost_inr": 33.95,
+            "yearly_cost_inr": 407.68,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Top 10 SKUs by Volume' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0022",
+          "chart_title": "Warehouse Utilization",
+          "chart_type": "scatter_plot",
+          "sql_query": "SELECT *\nFROM fact_sales fs, dim_customer dc, dim_product dp, dim_region dr, dim_date dd\nWHERE fs.customer_id = dc.customer_id\nAND fs.product_id = dp.product_id\nAND fs.region_id = dr.region_id\nAND fs.date_id = dd.date_id",
+          "weekly_views": 27,
+          "avg_view_duration_sec": 44.3,
+          "render_time_sec": 10.0,
+          "data_scanned_gb": 386.3,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
+            ],
+            "complexity_score": 47,
+            "join_count": 4,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 2.04,
+            "weekly_cost_inr": 14.29,
+            "monthly_cost_inr": 61.88,
+            "yearly_cost_inr": 743.17,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Warehouse Utilization' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0023",
+          "chart_title": "Vendor Payment Ageing",
+          "chart_type": "bar_chart",
+          "sql_query": "SELECT c.*, o.*, p.*\nFROM customers c\nCROSS JOIN orders o\nLEFT JOIN products p ON o.product_id = p.product_id\nWHERE c.signup_date > '2020-01-01'",
+          "weekly_views": 19,
+          "avg_view_duration_sec": 8.0,
+          "render_time_sec": 11.7,
+          "data_scanned_gb": 437.9,
+          "runs_per_week": 168,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (3x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Explicit CROSS JOIN used (1x) \u2014 cartesian product risk, very expensive on large tables"
+            ],
+            "complexity_score": 75,
+            "join_count": 2,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 2.39,
+            "weekly_cost_inr": 401.31,
+            "monthly_cost_inr": 1737.67,
+            "yearly_cost_inr": 20868.12,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Vendor Payment Ageing' costs \u20b91,738/month and its query has a complexity score of 75/100 (SELECT * used (3x) \u2014 pulls unnecessary columns, increases scan cost). Recommend rewriting the query (remove SELECT *, add filters, fix joins) before considering removal \u2014 usage is healthy at 19 views/week.",
+            "estimated_yearly_savings_inr": 10434.0
+          }
+        },
+        {
+          "chart_id": "CHART-0024",
+          "chart_title": "Monthly Active Customers",
+          "chart_type": "scatter_plot",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 2,
+          "avg_view_duration_sec": 30.0,
+          "render_time_sec": 2.6,
+          "data_scanned_gb": 0.6,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.08,
+            "weekly_cost_inr": 1.06,
+            "monthly_cost_inr": 4.6,
+            "yearly_cost_inr": 55.21,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Monthly Active Customers' is low-usage (2 views/week) but low-cost (\u20b95/month). Not urgent, but flag owner (Arjun Rao) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 47.0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 22074.18,
+      "dashboard_potential_savings_inr": 10481.0
+    },
+    {
+      "dashboard_id": "DASH-007",
+      "dashboard_name": "HR Dashboard 7",
+      "business_unit": "HR",
+      "owner": "Vikram Nair",
+      "bi_tool": "Power BI",
+      "charts": [
+        {
+          "chart_id": "CHART-0025",
+          "chart_title": "Lead Funnel Conversion",
+          "chart_type": "kpi_card",
+          "sql_query": "SELECT region, SUM(revenue) as total_revenue\nFROM fact_sales\nWHERE order_date >= CURRENT_DATE - INTERVAL '90 days'\nGROUP BY region\nORDER BY total_revenue DESC",
+          "weekly_views": 4,
+          "avg_view_duration_sec": 2.1,
+          "render_time_sec": 2.2,
+          "data_scanned_gb": 7.4,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "ORDER BY without LIMIT \u2014 sorts entire result set unnecessarily"
+            ],
+            "complexity_score": 10,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.13,
+            "weekly_cost_inr": 2.7,
+            "monthly_cost_inr": 11.67,
+            "yearly_cost_inr": 140.14,
+            "nodes_engaged": 1.0
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Lead Funnel Conversion' is low-usage (4 views/week) but low-cost (\u20b912/month). Not urgent, but flag owner (Vikram Nair) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 119.0
+          }
+        },
+        {
+          "chart_id": "CHART-0026",
+          "chart_title": "Revenue by Region",
+          "chart_type": "table",
+          "sql_query": "SELECT s.*, i.*\nFROM fact_shipments s, dim_inventory i\nWHERE s.warehouse_id = i.warehouse_id\nAND s.status != 'DELIVERED'\nGROUP BY s.shipment_id",
+          "weekly_views": 27,
+          "avg_view_duration_sec": 22.9,
+          "render_time_sec": 11.8,
+          "data_scanned_gb": 227.2,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
+            ],
+            "complexity_score": 45,
+            "join_count": 1,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 2.41,
+            "weekly_cost_inr": 16.86,
+            "monthly_cost_inr": 73.02,
+            "yearly_cost_inr": 876.94,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Revenue by Region' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0027",
+          "chart_title": "Revenue by Region",
+          "chart_type": "table",
+          "sql_query": "SELECT region, SUM(revenue) as total_revenue\nFROM fact_sales\nWHERE order_date >= CURRENT_DATE - INTERVAL '90 days'\nGROUP BY region\nORDER BY total_revenue DESC",
+          "weekly_views": 1,
+          "avg_view_duration_sec": 22.5,
+          "render_time_sec": 3.8,
+          "data_scanned_gb": 4.5,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "ORDER BY without LIMIT \u2014 sorts entire result set unnecessarily"
+            ],
+            "complexity_score": 10,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.11,
+            "weekly_cost_inr": 0.78,
+            "monthly_cost_inr": 3.36,
+            "yearly_cost_inr": 40.34,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Revenue by Region' is low-usage (1 views/week) but low-cost (\u20b93/month). Not urgent, but flag owner (Vikram Nair) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 34.0
+          }
+        },
+        {
+          "chart_id": "CHART-0028",
+          "chart_title": "Plant-wise Production Output",
+          "chart_type": "table",
+          "sql_query": "SELECT region, SUM(revenue) as total_revenue\nFROM fact_sales\nWHERE order_date >= CURRENT_DATE - INTERVAL '90 days'\nGROUP BY region\nORDER BY total_revenue DESC",
+          "weekly_views": 22,
+          "avg_view_duration_sec": 31.0,
+          "render_time_sec": 1.7,
+          "data_scanned_gb": 1.4,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "ORDER BY without LIMIT \u2014 sorts entire result set unnecessarily"
+            ],
+            "complexity_score": 10,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.05,
+            "weekly_cost_inr": 0.69,
+            "monthly_cost_inr": 3.01,
+            "yearly_cost_inr": 36.1,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Plant-wise Production Output' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 1093.52,
+      "dashboard_potential_savings_inr": 153.0
+    },
+    {
+      "dashboard_id": "DASH-008",
+      "dashboard_name": "Marketing Dashboard 8",
+      "business_unit": "Sales",
+      "owner": "Vikram Nair",
+      "bi_tool": "Tableau",
+      "charts": [
+        {
+          "chart_id": "CHART-0029",
+          "chart_title": "Customer Churn by Segment",
+          "chart_type": "kpi_card",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 9,
+          "avg_view_duration_sec": 13.2,
+          "render_time_sec": 3.0,
+          "data_scanned_gb": 2.9,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.09,
+            "weekly_cost_inr": 1.23,
+            "monthly_cost_inr": 5.3,
+            "yearly_cost_inr": 63.7,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Customer Churn by Segment' is low-usage (9 views/week) but low-cost (\u20b95/month). Not urgent, but flag owner (Vikram Nair) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 54.0
+          }
+        },
+        {
+          "chart_id": "CHART-0030",
+          "chart_title": "Inventory Ageing Report",
+          "chart_type": "table",
+          "sql_query": "SELECT product_category, COUNT(DISTINCT customer_id) as unique_customers\nFROM fact_orders o\nJOIN dim_product p ON o.product_id = p.product_id\nWHERE o.order_date >= CURRENT_DATE - INTERVAL '30 days'\nGROUP BY product_category",
+          "weekly_views": 15,
+          "avg_view_duration_sec": 41.9,
+          "render_time_sec": 3.8,
+          "data_scanned_gb": 0.6,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 1,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.11,
+            "weekly_cost_inr": 0.78,
+            "monthly_cost_inr": 3.36,
+            "yearly_cost_inr": 40.34,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Inventory Ageing Report' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0031",
+          "chart_title": "Order Fulfillment Rate",
+          "chart_type": "pie_chart",
+          "sql_query": "SELECT c.*, o.*, p.*\nFROM customers c\nCROSS JOIN orders o\nLEFT JOIN products p ON o.product_id = p.product_id\nWHERE c.signup_date > '2020-01-01'",
+          "weekly_views": 17,
+          "avg_view_duration_sec": 7.7,
+          "render_time_sec": 15.0,
+          "data_scanned_gb": 99.2,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (3x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Explicit CROSS JOIN used (1x) \u2014 cartesian product risk, very expensive on large tables"
+            ],
+            "complexity_score": 75,
+            "join_count": 2,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 1.75,
+            "weekly_cost_inr": 36.75,
+            "monthly_cost_inr": 159.13,
+            "yearly_cost_inr": 1911.0,
+            "nodes_engaged": 2.0
+          },
+          "decision": {
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Order Fulfillment Rate' has a poorly optimized query (complexity 75/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 573.0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 2015.04,
+      "dashboard_potential_savings_inr": 627.0
+    },
+    {
+      "dashboard_id": "DASH-009",
+      "dashboard_name": "HR Dashboard 9",
+      "business_unit": "Marketing",
+      "owner": "Arjun Rao",
+      "bi_tool": "Power BI",
+      "charts": [
+        {
+          "chart_id": "CHART-0032",
+          "chart_title": "Monthly Active Customers",
+          "chart_type": "line_chart",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 18,
+          "avg_view_duration_sec": 30.7,
+          "render_time_sec": 2.7,
+          "data_scanned_gb": 7.5,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.16,
+            "weekly_cost_inr": 3.31,
+            "monthly_cost_inr": 14.32,
+            "yearly_cost_inr": 171.99,
+            "nodes_engaged": 1.0
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Monthly Active Customers' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0033",
+          "chart_title": "Warehouse Utilization",
+          "chart_type": "line_chart",
+          "sql_query": "SELECT *\nFROM fact_sales fs, dim_customer dc, dim_product dp, dim_region dr, dim_date dd\nWHERE fs.customer_id = dc.customer_id\nAND fs.product_id = dp.product_id\nAND fs.region_id = dr.region_id\nAND fs.date_id = dd.date_id",
+          "weekly_views": 33,
+          "avg_view_duration_sec": 8.7,
+          "render_time_sec": 13.6,
+          "data_scanned_gb": 221.1,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
+            ],
+            "complexity_score": 47,
+            "join_count": 4,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 2.78,
+            "weekly_cost_inr": 58.31,
+            "monthly_cost_inr": 252.48,
+            "yearly_cost_inr": 3032.12,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Warehouse Utilization' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0034",
+          "chart_title": "Customer Churn by Segment",
+          "chart_type": "bar_chart",
+          "sql_query": "WITH cte1 AS (SELECT * FROM fact_transactions WHERE txn_date >= '2024-01-01'),\ncte2 AS (SELECT * FROM fact_transactions WHERE txn_date >= '2024-01-01'),\ncte3 AS (SELECT customer_id, SUM(amount) FROM cte1 GROUP BY customer_id)\nSELECT * FROM cte1 c1\nJOIN cte2 c2 ON c1.txn_id = c2.txn_id\nJOIN cte3 c3 ON c1.customer_id = c3.customer_id",
+          "weekly_views": 58,
+          "avg_view_duration_sec": 38.4,
+          "render_time_sec": 9.8,
+          "data_scanned_gb": 404.3,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (3x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Duplicate CTE definitions detected \u2014 same computation repeated, wastes compute",
+              "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
+            ],
+            "complexity_score": 80,
+            "join_count": 2,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 2.0,
+            "weekly_cost_inr": 14.01,
+            "monthly_cost_inr": 60.65,
+            "yearly_cost_inr": 728.3,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Customer Churn by Segment' has a poorly optimized query (complexity 80/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 218.0
+          }
+        },
+        {
+          "chart_id": "CHART-0035",
+          "chart_title": "Top 10 SKUs by Volume",
+          "chart_type": "table",
+          "sql_query": "SELECT c.*, o.*, p.*\nFROM customers c\nCROSS JOIN orders o\nLEFT JOIN products p ON o.product_id = p.product_id\nWHERE c.signup_date > '2020-01-01'",
+          "weekly_views": 25,
+          "avg_view_duration_sec": 13.3,
+          "render_time_sec": 22.8,
+          "data_scanned_gb": 514.4,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (3x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Explicit CROSS JOIN used (1x) \u2014 cartesian product risk, very expensive on large tables"
+            ],
+            "complexity_score": 75,
+            "join_count": 2,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 4.66,
+            "weekly_cost_inr": 32.59,
+            "monthly_cost_inr": 141.09,
+            "yearly_cost_inr": 1694.42,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Top 10 SKUs by Volume' has a poorly optimized query (complexity 75/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 508.0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 5626.83,
+      "dashboard_potential_savings_inr": 726.0
+    },
+    {
+      "dashboard_id": "DASH-010",
+      "dashboard_name": "Sales Dashboard 10",
+      "business_unit": "Operations",
+      "owner": "Rahul Mehta",
+      "bi_tool": "Tableau",
+      "charts": [
+        {
+          "chart_id": "CHART-0036",
+          "chart_title": "Plant-wise Production Output",
+          "chart_type": "scatter_plot",
+          "sql_query": "WITH cte1 AS (SELECT * FROM fact_transactions WHERE txn_date >= '2024-01-01'),\ncte2 AS (SELECT * FROM fact_transactions WHERE txn_date >= '2024-01-01'),\ncte3 AS (SELECT customer_id, SUM(amount) FROM cte1 GROUP BY customer_id)\nSELECT * FROM cte1 c1\nJOIN cte2 c2 ON c1.txn_id = c2.txn_id\nJOIN cte3 c3 ON c1.customer_id = c3.customer_id",
+          "weekly_views": 21,
+          "avg_view_duration_sec": 8.4,
+          "render_time_sec": 10.5,
+          "data_scanned_gb": 305.1,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (3x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Duplicate CTE definitions detected \u2014 same computation repeated, wastes compute",
+              "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
+            ],
+            "complexity_score": 80,
+            "join_count": 2,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 2.14,
+            "weekly_cost_inr": 15.01,
+            "monthly_cost_inr": 64.98,
+            "yearly_cost_inr": 780.33,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Plant-wise Production Output' has a poorly optimized query (complexity 80/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 234.0
+          }
+        },
+        {
+          "chart_id": "CHART-0037",
+          "chart_title": "Vendor Payment Ageing",
+          "chart_type": "kpi_card",
+          "sql_query": "SELECT region, SUM(revenue) as total_revenue\nFROM fact_sales\nWHERE order_date >= CURRENT_DATE - INTERVAL '90 days'\nGROUP BY region\nORDER BY total_revenue DESC",
+          "weekly_views": 28,
+          "avg_view_duration_sec": 30.7,
+          "render_time_sec": 2.1,
+          "data_scanned_gb": 4.7,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "ORDER BY without LIMIT \u2014 sorts entire result set unnecessarily"
+            ],
+            "complexity_score": 10,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.06,
+            "weekly_cost_inr": 0.86,
+            "monthly_cost_inr": 3.71,
+            "yearly_cost_inr": 44.59,
+            "nodes_engaged": 0.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Vendor Payment Ageing' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0038",
+          "chart_title": "Revenue by Region",
+          "chart_type": "line_chart",
+          "sql_query": "SELECT region, SUM(revenue) as total_revenue\nFROM fact_sales\nWHERE order_date >= CURRENT_DATE - INTERVAL '90 days'\nGROUP BY region\nORDER BY total_revenue DESC",
+          "weekly_views": 49,
+          "avg_view_duration_sec": 44.0,
+          "render_time_sec": 3.4,
+          "data_scanned_gb": 7.1,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "ORDER BY without LIMIT \u2014 sorts entire result set unnecessarily"
+            ],
+            "complexity_score": 10,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.2,
+            "weekly_cost_inr": 4.16,
+            "monthly_cost_inr": 18.03,
+            "yearly_cost_inr": 216.58,
+            "nodes_engaged": 1.0
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Revenue by Region' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 1041.5,
+      "dashboard_potential_savings_inr": 234.0
+    },
+    {
+      "dashboard_id": "DASH-011",
+      "dashboard_name": "Operations Dashboard 11",
+      "business_unit": "Operations",
+      "owner": "Rahul Mehta",
+      "bi_tool": "Power BI",
+      "charts": [
+        {
+          "chart_id": "CHART-0039",
+          "chart_title": "Plant-wise Production Output",
+          "chart_type": "kpi_card",
+          "sql_query": "SELECT *\nFROM fact_sales fs, dim_customer dc, dim_product dp, dim_region dr, dim_date dd\nWHERE fs.customer_id = dc.customer_id\nAND fs.product_id = dp.product_id\nAND fs.region_id = dr.region_id\nAND fs.date_id = dd.date_id",
+          "weekly_views": 12,
+          "avg_view_duration_sec": 3.7,
+          "render_time_sec": 17.4,
+          "data_scanned_gb": 211.6,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
+            ],
+            "complexity_score": 47,
+            "join_count": 4,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 3.55,
+            "weekly_cost_inr": 74.6,
+            "monthly_cost_inr": 323.03,
+            "yearly_cost_inr": 3879.33,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Plant-wise Production Output' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0040",
+          "chart_title": "Monthly Active Customers",
+          "chart_type": "scatter_plot",
+          "sql_query": "SELECT c.*, o.*, p.*\nFROM customers c\nCROSS JOIN orders o\nLEFT JOIN products p ON o.product_id = p.product_id\nWHERE c.signup_date > '2020-01-01'",
+          "weekly_views": 6,
+          "avg_view_duration_sec": 30.4,
+          "render_time_sec": 16.0,
+          "data_scanned_gb": 279.6,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (3x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Explicit CROSS JOIN used (1x) \u2014 cartesian product risk, very expensive on large tables"
+            ],
+            "complexity_score": 75,
+            "join_count": 2,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 3.27,
+            "weekly_cost_inr": 68.6,
+            "monthly_cost_inr": 297.04,
+            "yearly_cost_inr": 3567.2,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Monthly Active Customers' is low-usage (6 views/week) but low-cost (\u20b9297/month). Not urgent, but flag owner (Rahul Mehta) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 3032.0
+          }
+        },
+        {
+          "chart_id": "CHART-0041",
+          "chart_title": "Monthly Active Customers",
+          "chart_type": "pie_chart",
+          "sql_query": "SELECT s.*, i.*\nFROM fact_shipments s, dim_inventory i\nWHERE s.warehouse_id = i.warehouse_id\nAND s.status != 'DELIVERED'\nGROUP BY s.shipment_id",
+          "weekly_views": 12,
+          "avg_view_duration_sec": 44.2,
+          "render_time_sec": 18.7,
+          "data_scanned_gb": 847.7,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
+            ],
+            "complexity_score": 45,
+            "join_count": 1,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 3.82,
+            "weekly_cost_inr": 53.45,
+            "monthly_cost_inr": 231.44,
+            "yearly_cost_inr": 2779.44,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Monthly Active Customers' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0042",
+          "chart_title": "Top 10 SKUs by Volume",
+          "chart_type": "table",
+          "sql_query": "SELECT product_category, COUNT(DISTINCT customer_id) as unique_customers\nFROM fact_orders o\nJOIN dim_product p ON o.product_id = p.product_id\nWHERE o.order_date >= CURRENT_DATE - INTERVAL '30 days'\nGROUP BY product_category",
+          "weekly_views": 0,
+          "avg_view_duration_sec": 27.7,
+          "render_time_sec": 2.0,
+          "data_scanned_gb": 6.4,
+          "runs_per_week": 7,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 1,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.12,
+            "weekly_cost_inr": 0.82,
+            "monthly_cost_inr": 3.54,
+            "yearly_cost_inr": 42.47,
+            "nodes_engaged": 1.0
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Top 10 SKUs by Volume' is low-usage (0 views/week) but low-cost (\u20b94/month). Not urgent, but flag owner (Rahul Mehta) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 36.0
+          }
+        },
+        {
+          "chart_id": "CHART-0043",
+          "chart_title": "Lead Funnel Conversion",
+          "chart_type": "table",
+          "sql_query": "SELECT s.*, i.*\nFROM fact_shipments s, dim_inventory i\nWHERE s.warehouse_id = i.warehouse_id\nAND s.status != 'DELIVERED'\nGROUP BY s.shipment_id",
+          "weekly_views": 5,
+          "avg_view_duration_sec": 3.9,
+          "render_time_sec": 16.7,
+          "data_scanned_gb": 487.1,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
+            ],
+            "complexity_score": 45,
+            "join_count": 1,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 3.41,
+            "weekly_cost_inr": 47.73,
+            "monthly_cost_inr": 206.69,
+            "yearly_cost_inr": 2482.18,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Lead Funnel Conversion' is low-usage (5 views/week) but low-cost (\u20b9207/month). Not urgent, but flag owner (Rahul Mehta) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 2110.0
+          }
+        },
+        {
+          "chart_id": "CHART-0044",
+          "chart_title": "Monthly Active Customers",
+          "chart_type": "heatmap",
+          "sql_query": "SELECT *\nFROM fact_sales fs, dim_customer dc, dim_product dp, dim_region dr, dim_date dd\nWHERE fs.customer_id = dc.customer_id\nAND fs.product_id = dp.product_id\nAND fs.region_id = dr.region_id\nAND fs.date_id = dd.date_id",
+          "weekly_views": 74,
+          "avg_view_duration_sec": 41.6,
+          "render_time_sec": 20.5,
+          "data_scanned_gb": 610.5,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
+            ],
+            "complexity_score": 47,
+            "join_count": 4,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 4.19,
+            "weekly_cost_inr": 87.89,
+            "monthly_cost_inr": 380.58,
+            "yearly_cost_inr": 4570.47,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Monthly Active Customers' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 17321.09,
+      "dashboard_potential_savings_inr": 5178.0
+    },
+    {
+      "dashboard_id": "DASH-012",
+      "dashboard_name": "Operations Dashboard 12",
+      "business_unit": "HR",
+      "owner": "Ananya Iyer",
+      "bi_tool": "Power BI",
+      "charts": [
+        {
+          "chart_id": "CHART-0045",
+          "chart_title": "Plant-wise Production Output",
+          "chart_type": "line_chart",
+          "sql_query": "SELECT month, dept_name, SUM(headcount) as total_headcount\nFROM fact_hr_monthly\nWHERE year = 2026\nGROUP BY month, dept_name",
+          "weekly_views": 3,
+          "avg_view_duration_sec": 20.1,
+          "render_time_sec": 3.8,
+          "data_scanned_gb": 5.6,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "No major anti-patterns detected \u2014 query looks reasonably well-optimized"
+            ],
+            "complexity_score": 0,
+            "join_count": 0,
+            "has_select_star": false,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 0.22,
+            "weekly_cost_inr": 4.65,
+            "monthly_cost_inr": 20.16,
+            "yearly_cost_inr": 242.06,
+            "nodes_engaged": 1.0
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Plant-wise Production Output' is low-usage (3 views/week) but low-cost (\u20b920/month). Not urgent, but flag owner (Ananya Iyer) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 206.0
+          }
+        },
+        {
+          "chart_id": "CHART-0046",
+          "chart_title": "Warehouse Utilization",
+          "chart_type": "kpi_card",
+          "sql_query": "SELECT *\nFROM fact_sales fs, dim_customer dc, dim_product dp, dim_region dr, dim_date dd\nWHERE fs.customer_id = dc.customer_id\nAND fs.product_id = dp.product_id\nAND fs.region_id = dr.region_id\nAND fs.date_id = dd.date_id",
+          "weekly_views": 9,
+          "avg_view_duration_sec": 11.0,
+          "render_time_sec": 23.7,
+          "data_scanned_gb": 561.7,
+          "runs_per_week": 168,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
+            ],
+            "complexity_score": 47,
+            "join_count": 4,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 4.84,
+            "weekly_cost_inr": 812.91,
+            "monthly_cost_inr": 3519.9,
+            "yearly_cost_inr": 42271.32,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "REMOVE",
+            "recommendation": "Chart 'Warehouse Utilization' is viewed only 9x/week but costs \u20b93,520/month (\u20b942,271/year) in warehouse compute. Recommend replacing with a static pre-aggregated KPI card refreshed daily instead of on every dashboard load.",
+            "estimated_yearly_savings_inr": 35931.0
+          }
+        },
+        {
+          "chart_id": "CHART-0047",
+          "chart_title": "Employee Attrition by Dept",
+          "chart_type": "bar_chart",
+          "sql_query": "SELECT c.*, o.*, p.*\nFROM customers c\nCROSS JOIN orders o\nLEFT JOIN products p ON o.product_id = p.product_id\nWHERE c.signup_date > '2020-01-01'",
+          "weekly_views": 17,
+          "avg_view_duration_sec": 36.1,
+          "render_time_sec": 27.2,
+          "data_scanned_gb": 672.9,
+          "runs_per_week": 21,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (3x) \u2014 pulls unnecessary columns, increases scan cost",
+              "Explicit CROSS JOIN used (1x) \u2014 cartesian product risk, very expensive on large tables"
+            ],
+            "complexity_score": 75,
+            "join_count": 2,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 5.55,
+            "weekly_cost_inr": 116.62,
+            "monthly_cost_inr": 504.96,
+            "yearly_cost_inr": 6064.24,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "OPTIMIZE_SQL",
+            "recommendation": "Chart 'Employee Attrition by Dept' has a poorly optimized query (complexity 75/100) even though current cost is moderate. Fixing now prevents cost growth as data volume increases.",
+            "estimated_yearly_savings_inr": 1819.0
+          }
+        },
+        {
+          "chart_id": "CHART-0048",
+          "chart_title": "Order Fulfillment Rate",
+          "chart_type": "scatter_plot",
+          "sql_query": "SELECT s.*, i.*\nFROM fact_shipments s, dim_inventory i\nWHERE s.warehouse_id = i.warehouse_id\nAND s.status != 'DELIVERED'\nGROUP BY s.shipment_id",
+          "weekly_views": 10,
+          "avg_view_duration_sec": 37.2,
+          "render_time_sec": 23.0,
+          "data_scanned_gb": 618.6,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (2x) \u2014 pulls unnecessary columns, increases scan cost",
+              "GROUP BY combined with SELECT * \u2014 expensive aggregation over unnecessary columns"
+            ],
+            "complexity_score": 45,
+            "join_count": 1,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 4.7,
+            "weekly_cost_inr": 65.74,
+            "monthly_cost_inr": 284.66,
+            "yearly_cost_inr": 3418.57,
+            "nodes_engaged": 3.5
+          },
+          "decision": {
+            "verdict": "KEEP",
+            "recommendation": "Chart 'Order Fulfillment Rate' is healthy \u2014 good usage, reasonable cost, clean query.",
+            "estimated_yearly_savings_inr": 0
+          }
+        },
+        {
+          "chart_id": "CHART-0049",
+          "chart_title": "Top 10 SKUs by Volume",
+          "chart_type": "heatmap",
+          "sql_query": "SELECT *\nFROM fact_sales fs, dim_customer dc, dim_product dp, dim_region dr, dim_date dd\nWHERE fs.customer_id = dc.customer_id\nAND fs.product_id = dp.product_id\nAND fs.region_id = dr.region_id\nAND fs.date_id = dd.date_id",
+          "weekly_views": 7,
+          "avg_view_duration_sec": 22.4,
+          "render_time_sec": 25.0,
+          "data_scanned_gb": 102.6,
+          "runs_per_week": 14,
+          "sql_analysis": {
+            "issues": [
+              "SELECT * used (1x) \u2014 pulls unnecessary columns, increases scan cost",
+              "High join count (4 joins) \u2014 increases query planning complexity and shuffle cost"
+            ],
+            "complexity_score": 47,
+            "join_count": 4,
+            "has_select_star": true,
+            "parse_error": false
+          },
+          "cost_analysis": {
+            "cost_per_run_inr": 2.92,
+            "weekly_cost_inr": 40.83,
+            "monthly_cost_inr": 176.81,
+            "yearly_cost_inr": 2123.33,
+            "nodes_engaged": 2.0
+          },
+          "decision": {
+            "verdict": "MONITOR",
+            "recommendation": "Chart 'Top 10 SKUs by Volume' is low-usage (7 views/week) but low-cost (\u20b9177/month). Not urgent, but flag owner (Ananya Iyer) to confirm it's still needed.",
+            "estimated_yearly_savings_inr": 1805.0
+          }
+        }
+      ],
+      "dashboard_yearly_cost_inr": 54119.52,
+      "dashboard_potential_savings_inr": 39761.0
+    }
+  ]
+}

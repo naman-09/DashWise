@@ -1,0 +1,27 @@
+# One-command demo:  docker compose up --build
+#
+#   1. `pipeline` generates synthetic data, runs the SQL/cost/decision agents,
+#      and publishes analysis_results.json to the shared `analysis` volume.
+#   2. `frontend` waits for the pipeline to finish, then serves the React
+#      console (with the freshly generated data) at http://localhost:8080
+services:
+  pipeline:
+    build:
+      context: .
+      dockerfile: Dockerfile.pipeline
+    volumes:
+      - analysis:/shared
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "8080:80"
+    volumes:
+      - analysis:/shared:ro
+    depends_on:
+      pipeline:
+        condition: service_completed_successfully
+
+volumes:
+  analysis:
